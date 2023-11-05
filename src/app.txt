@@ -4,33 +4,13 @@ import * as cam from '@mediapipe/camera_utils';
 import * as controls from '@mediapipe/control_utils';
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import * as holistics from '@mediapipe/holistic';
-import { makePrediction } from "./utilities"; 
+import { drawPrediction } from "./utilities"; 
 
 import * as tf from "@tensorflow/tfjs";
 import { nextFrame } from "@tensorflow/tfjs";
 
-const labelMap = {
-  1:{name:'Ako', color:'red'},
-  2:{name:'Bakit', color:'yellow'},
-  3:{name:'F', color:'lime'},
-  4:{name:'Hi', color:'blue'},
-  5:{name:'Hindi', color:'purple'},
-  6:{name:'Ikaw', color:'red'},
-  7:{name:'Kamusta', color:'yellow'},
-  8:{name:'L', color:'lime'},
-  9:{name:'Maganda', color:'blue'},
-  10:{name:'Magandang Umaga', color:'purple'},
-  11:{name:'N', color:'red'},
-  12:{name:'O', color:'yellow'},
-  13:{name:'Oo', color:'lime'},
-  14:{name:'P', color:'blue'},
-  15:{name:'Salamat', color:'purple'},
-}
-
 const net = await tf.loadLayersModel('https://senyasfsltranslator.s3.jp-tok.cloud-object-storage.appdomain.cloud/model.json')
 net.summary();
-let frameCounter = 0;
-const framesData = [];
 
 function App() {
   const webcamRef = useRef(null);
@@ -77,17 +57,7 @@ function App() {
 
       // console.log(model.poseLandmarks)
       // Call the frameCount function to track frames and collect data
-      if (framesData.length === 30){
-        frameCount(model, ctx);
-      } else{
-        const pose = model.poseLandmarks ? model.poseLandmarks.map(landmark => [landmark.x, landmark.y, landmark.z, landmark.visibility]).flat() : new Array(33*4).fill(0);
-        const lh = model.leftHandLandmarks ? model.leftHandLandmarks.map(landmark => [landmark.x, landmark.y, landmark.z]).flat() : new Array(21*3).fill(0);
-        const rh = model.rightHandLandmarks ? model.rightHandLandmarks.map(landmark => [landmark.x, landmark.y, landmark.z]).flat() : new Array(21*3).fill(0);
-        
-        const frameData = [...pose, ...lh, ...rh];
-        
-        framesData.push(frameData);
-      }
+      frameCount(model, ctx);
       
       ctx.restore();
     }
@@ -115,9 +85,7 @@ function App() {
     if (typeof webcamRef.current !== "undefined" && webcamRef.current !== null) {
       camera = new cam.Camera(webcamRef.current.video, {
         onFrame: async () => {
-          frameCounter++;
           await holistic.send({ image: webcamRef.current.video })
-          console.log("frames ", frameCounter);
         },
         width: 1280,
         height: 900
@@ -126,40 +94,9 @@ function App() {
     }
   });
 
-  const [lastPrediction, setLastPrediction] = useState(null);
-
-function getArrayShape(array) {
-    return [array.length, array[0].length];
-}
-
-function frameCount(results, ctx) {
-    if (framesData.length === 30) {
-      // Process the collected 30 frames data
-      // console.log(getArrayShape(framesData));
-      processFramesData(framesData, ctx);
-      // Reset the framesData array
-      // console.log(framesData);
-      framesData.length = 0;
-      // console.log(framesData);
-
-    }
-  }
-
-async function processFramesData(framesData, ctx) {
-  const tensor = tf.tensor(framesData);
-  const expanded = tensor.expandDims(0);
-  // console.log(expanded.shape);
-  const scores = net.predict(expanded);
-  const label = await makePrediction(scores, 0.8, 1280, 900, ctx)
-  setLastPrediction(label);
-  tf.dispose(tensor)
-  tf.dispose(expanded)
-  tf.dispose(scores)
-}
 
   return (
-    <div>Last prediction: {lastPrediction}
-      <div>
+    <div>
       <Webcam
         ref={webcamRef}
         audio={false}
@@ -193,10 +130,54 @@ async function processFramesData(framesData, ctx) {
         id="myCanvas"
       />
     </div>
-    </div>
-    
 
   );
+}
+
+let frameCounter = 0;
+const framesData = [];
+
+function getArrayShape(array) {
+    return [array.length, array[0].length];
+}
+
+function frameCount(results, ctx) {
+    while (frameCounter < 30) {
+      const pose = results.poseLandmarks ? results.poseLandmarks.map(landmark => [landmark.x, landmark.y, landmark.z, landmark.visibility]).flat() : new Array(33*4).fill(0);
+      const lh = results.leftHandLandmarks ? results.leftHandLandmarks.map(landmark => [landmark.x, landmark.y, landmark.z]).flat() : new Array(21*3).fill(0);
+      const rh = results.rightHandLandmarks ? results.rightHandLandmarks.map(landmark => [landmark.x, landmark.y, landmark.z]).flat() : new Array(21*3).fill(0);
+      
+      const frameData = [...pose, ...lh, ...rh];
+  
+      
+      framesData.push(frameData);
+      frameCounter++;
+    }
+  
+    if (frameCounter === 30) {
+      // Reset the frame counter
+      frameCounter = 0;
+      // Process the collected 30 frames data
+      console.log(getArrayShape(framesData));
+      processFramesData(framesData, ctx);
+      // Reset the framesData array
+      console.log(framesData);
+      framesData.length = 0;
+      console.log(framesData);
+
+    }
+  }
+
+async function processFramesData(framesData, ctx) {
+  const tensor = tf.tensor(framesData);
+  const expanded = tensor.expandDims(0);
+  // console.log(expanded.shape);
+  const scores = net.predict(expanded);
+  scores.print();
+  drawPrediction(scores, 0.8, 1280, 900, ctx)
+  tf.dispose(tensor)
+  tf.dispose(expanded)
+  tf.dispose(scores)
 }
 
 export default App;

@@ -19,7 +19,7 @@ const labelMap = {
 }
 
 // Define a drawing function
-export const drawPrediction = async (scores, threshold, imgWidth, imgHeight, ctx) => {
+export const makePrediction = async (scores, threshold, imgWidth, imgHeight, ctx) => {
     console.log("Predicting...");
     // Clear the previous drawings/text
     ctx.clearRect(0, 0, imgWidth, imgHeight);
@@ -34,25 +34,28 @@ export const drawPrediction = async (scores, threshold, imgWidth, imgHeight, ctx
 
     console.log(maxScore);
     console.log(index);
+    const label = labelMap[index]['name'];
+    console.log("label", label)
     // Check if the maximum score is above the threshold
-    if (maxScore > threshold) {
-        console.log(labelMap[index]['name']);
-        // Retrieve the corresponding label from labelMap
-        const label = labelMap[index]['name'];
-        const color = labelMap[index]['color'];
+    // if (maxScore > threshold) {
+    //     console.log(labelMap[index]['name']);
+    //     // Retrieve the corresponding label from labelMap
+    //     const label = labelMap[index]['name'];
+    //     const color = labelMap[index]['color'];
     
-        // Set the text and color
-        const text = `${label} - ${Math.round(maxScore * 100) / 100}`; // round to 2 decimal places
+    //     // Set the text and color
+    //     const text = `${label} - ${Math.round(maxScore * 100) / 100}`; // round to 2 decimal places
     
-        // Set styling for the text
-        ctx.fillStyle = color;
-        ctx.font = '30px Arial';
+    //     // Set styling for the text
+    //     ctx.fillStyle = color;
+    //     ctx.font = '30px Arial';
     
-        // Set text alignment to center and middle for both horizontal and vertical alignment
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
+    //     // Set text alignment to center and middle for both horizontal and vertical alignment
+    //     ctx.textAlign = 'center';
+    //     ctx.textBaseline = 'middle';
     
-        // Write the text in the middle of the canvas
-        ctx.fillText(text, imgWidth / 4, imgHeight / 4);
-    }    
+    //     // Write the text in the middle of the canvas
+    //     ctx.fillText(text, imgWidth / 4, imgHeight / 4);
+    // }   
+    return label;
 }
