@@ -41,6 +41,8 @@ function App() {
   const [averageLatency, setAverageLatency] = useState(0);
   let totalLatency = 0;
   let predictionCount = 0;
+  const [camHeight, setCamHeight] = useState(0);
+  const [camWidth, setCamWidth] = useState(0);
 
 
   const onResults = async (model) => {
@@ -49,6 +51,9 @@ function App() {
 
       const videoWidth = webcamRef.current.video.videoWidth;
       const videoHeight = webcamRef.current.video.videoHeight;
+      
+      setCamHeight(videoHeight);
+      setCamWidth(videoWidth);
 
       canvasRef.current.width = videoWidth;
       canvasRef.current.height = videoHeight;
@@ -170,14 +175,20 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
 }
 
   return (
-    <div className = "flex flex-col items-center">
+    <div className = "flex flex-col items-center justify-center">
     <div className="flex justify-center items-center h-screen">
-      <h4 style={{
+      <h6 style={{
     fontWeight: 'medium',
-    fontSize: '2em',
+    fontSize: '1em',
     textAlign: 'center',
   }}
-  >Last prediction: {lastPrediction} | Average Prediction Latency: {averageLatency.toFixed(2)} ms</h4>
+  >Last prediction: {lastPrediction} </h6>
+<h6 style={{
+    fontWeight: 'medium',
+    fontSize: '0.8em',
+    textAlign: 'center',
+  }}>Avg. Prediction Latency: {averageLatency.toFixed(2)} ms @ {predictionCount} predicts</h6>
+
     </div>      
     <div>
       <Webcam
@@ -192,11 +203,11 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
           right: 0,
           textAlign: "center",
           zindex: 9,
-          width: '75vw', // 80% of the viewport width
-          height: '50vw', // Keeping aspect ratio of 16:9
-          '@media (max-width: 600px)': { // Media query for smartphones
-              width: '100vw', // 9:16 aspect ratio
-              height: '90vh',
+          width: {camWidth}, // 9:16 aspect ratio
+          height: {camHeight},
+          '@media': { // Media query for smartphones
+              width: {camWidth}, // 9:16 aspect ratio
+              height: {camHeight},
           }
         }}
       />
@@ -211,11 +222,11 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
           right: 0,
           textAlign: "center",
           zindex: 9,
-          width: '75vw', // 80% of the viewport width
-          height: '50vw', // Keeping aspect ratio of 16:9
+          width: {camWidth}, // 9:16 aspect ratio
+          height: {camHeight},
           '@media': { // Media query for smartphones
-              width: '100vw', // 9:16 aspect ratio
-              height: '90vh',
+              width: {camWidth}, // 9:16 aspect ratio
+              height: {camHeight},
           }
         }}
         id="myCanvas"
