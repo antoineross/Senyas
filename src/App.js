@@ -166,7 +166,12 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
   return (
     <div className = "flex flex-col items-center">
     <div className="flex justify-center items-center h-screen">
-      <h3 className="font-bold text-4xl text-center">Last prediction: {lastPrediction}</h3>
+      <h3 style={{
+    fontWeight: 'medium',
+    fontSize: '2em',
+    textAlign: 'center',
+  }}
+  >Last prediction: {lastPrediction}</h3>
     </div>      
     <div>
       <Webcam
