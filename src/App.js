@@ -120,8 +120,13 @@ function App() {
   useEffect(() => {
     const getCameraStream = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        webcamRef.current.srcObject = stream;
+        // Use generic media constraints
+        const constraints = { video: true };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+  
+        if (webcamRef.current) {
+          webcamRef.current.srcObject = stream;
+        }
       } catch (err) {
         console.error("Error accessing the camera: ", err);
       }
