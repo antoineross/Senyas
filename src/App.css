@@ -21,11 +21,71 @@
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: rgb(7, 6, 6);
 }
+
 
 .App-link {
   color: #61dafb;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 300px; /* Or any preferred width */
+  background-color: #181818;
+  color: #fafafa;
+  transition: width 0.3s ease; /* Smooth transition for width change */
+  z-index: 1000; /* Ensure it's above other content */
+  /* Additional styling as needed */
+}
+
+.dropdown {
+  width: 250px;
+  background-color: #181818;
+  color: #fafafa;
+  transition: all 0.3s ease; /* Add smooth transition for width change */
+}
+
+.dropdown select {
+  width: 50%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #000000;
+  appearance: none; /* Removes default dropdown arrow in some browsers */
+  align-items: center;
+  justify-content: center;
+  color: #fafafa;
+}
+
+.dropdown select:focus {
+  outline: none; /* Remove focus outline */
+  border-color: #555;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+
+.sidebar-header h2 {
+  margin-bottom: 10px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
 }
 
 @keyframes App-logo-spin {

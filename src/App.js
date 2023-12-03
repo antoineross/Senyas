@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import './App.css';
 import Webcam from 'react-webcam';
 import * as cam from '@mediapipe/camera_utils';
 import * as controls from '@mediapipe/control_utils';
@@ -45,6 +46,70 @@ const framesData = [];
 let predictioncount = 0;
 let totalLatency = 0;
 
+const Sidebar = ({ onAppModeChange }) => {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [appMode, setAppMode] = useState('About App'); // State for selected app mode
+
+  const toggleSidebar = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+
+const handleAppModeChange = (event) => {
+  setAppMode(event.target.value); // Update selected app mode
+};
+
+  return (
+    <div className={"sidebar"}>
+      <div className="dropdown">
+        <h2>Senyas: Filipino Sign Language Translator solution</h2>
+        <h4>Parameters</h4>
+        <div class="centered-content">
+          <select value={appMode} onChange={handleAppModeChange}>
+            <option value="About App">About App</option>
+            <option value="Run on Video">Run on Video</option>
+            <option value="Add a video">Add a video</option>
+          </select>
+        </div>
+      </div>
+      <ul>
+        <li>Menu Item 1</li>
+        <li>Menu Item 2</li>
+        <li>Menu Item 3</li>
+        {/* Add more menu items as needed */}
+      </ul>
+      <div className="content">
+        {/* Main content area */}
+        <button onClick={toggleSidebar}>Toggle Sidebar</button>
+        <h1>Main Content</h1>
+        {/* Render content based on app mode */}
+        {appMode === 'About App' && (
+          <div>
+            {/* About App content */}
+            <p>About App: Details here</p>
+          </div>
+        )}
+        {appMode === 'Run on Video' && (
+          <div>
+            {/* Run on Video content */}
+            <p>Run on Video: Details here</p>
+          </div>
+        )}
+        {appMode === 'Add a video' && (
+          <div>
+            {/* Add a video content */}
+            <p>Add a video: Details here</p>
+          </div>
+        )}
+      </div>
+      {/* ...rest of the sidebar content */}
+    </div>
+  );
+};
+
+
+
+
 function App() {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
@@ -57,6 +122,11 @@ function App() {
   const [camHeight, setCamHeight] = useState(0);
   const [camWidth, setCamWidth] = useState(0);
 
+  const [appMode, setAppMode] = useState('About App');
+
+  const handleAppModeChange = (selectedMode) => {
+    setAppMode(selectedMode); // Update the app mode based on sidebar selection
+  };
 
   const onResults = async (model) => {
     if (typeof webcamRef.current !== "undefined" &&  webcamRef.current !== null && webcamRef.current.video.readyState === 4) {
@@ -207,6 +277,7 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
   return (
     <div className = "flex flex-col items-center justify-center">
     <div className="flex justify-center items-center h-screen">
+      <Sidebar onAppModeChange={handleAppModeChange} />
       <h6 style={{
     fontWeight: 'medium',
     fontSize: '1em',
@@ -218,8 +289,8 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
     fontSize: '0.8em',
     textAlign: 'center',
   }}>Avg. Prediction Latency: {averageLatency.toFixed(2)} ms @ {predictionCount} predicts</h6>
+    </div>
 
-    </div>      
     <div>
       <Webcam
         ref={webcamRef}
