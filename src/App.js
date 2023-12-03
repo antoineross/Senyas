@@ -118,10 +118,21 @@ function App() {
 
 
   useEffect(() => {
+    const getCameraStream = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        webcamRef.current.srcObject = stream;
+      } catch (err) {
+        console.error("Error accessing the camera: ", err);
+      }
+    };
+  
+    getCameraStream();
+  
     const holistic = new holistics.Holistic({locateFile: (file) => {
       return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
     }});
-
+  
     holistic.setOptions({
       modelComplexity: 1,
       smoothLandmarks: false,
@@ -131,22 +142,22 @@ function App() {
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5
     });
-
+  
     holistic.onResults(onResults);
-
+  
     if (typeof webcamRef.current !== "undefined" && webcamRef.current !== null) {
       camera = new cam.Camera(webcamRef.current.video, {
         onFrame: async () => {
           frameCounter++;
-          await holistic.send({ image: webcamRef.current.video })
+          await holistic.send({ image: webcamRef.current.video });
         },
         width: window.innerWidth,
         height: window.innerHeight
       });
       camera.start();
     }
-  });
-
+  }, []);
+  
 function getArrayShape(array) {
     return [array.length, array[0].length];
 }
