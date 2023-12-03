@@ -37,6 +37,10 @@ function App() {
   const canvasRef = useRef(null);
   const connect = window.drawConnectors;
   var camera = null;
+  const [lastPrediction, setLastPrediction] = useState(null);
+  const [averageLatency, setAverageLatency] = useState(0);
+  let totalLatency = 0;
+  let predictionCount = 0;
 
 
   const onResults = async (model) => {
@@ -117,7 +121,6 @@ function App() {
         onFrame: async () => {
           frameCounter++;
           await holistic.send({ image: webcamRef.current.video })
-          console.log("frames ", frameCounter);
         },
         width: window.innerWidth,
         height: window.innerHeight
@@ -125,8 +128,6 @@ function App() {
       camera.start();
     }
   });
-
-  const [lastPrediction, setLastPrediction] = useState(null);
 
 function getArrayShape(array) {
     return [array.length, array[0].length];
@@ -155,7 +156,12 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
 
   // Calculate and log latency
   const latency = endTime - startTime;
+  totalLatency += latency;
+  predictionCount++;
+  setAverageLatency(totalLatency / predictionCount);
+
   console.log(`Prediction latency: ${latency} milliseconds`);
+  console.log(`Average Prediction latency: ${totalLatency/predictionCount} milliseconds`);
 
   setLastPrediction(label);
   tf.dispose(tensor)
@@ -166,12 +172,12 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
   return (
     <div className = "flex flex-col items-center">
     <div className="flex justify-center items-center h-screen">
-      <h3 style={{
+      <h4 style={{
     fontWeight: 'medium',
     fontSize: '2em',
     textAlign: 'center',
   }}
-  >Last prediction: {lastPrediction}</h3>
+  >Last prediction: {lastPrediction} | Average Prediction Latency: {averageLatency.toFixed(2)} ms</h4>
     </div>      
     <div>
       <Webcam

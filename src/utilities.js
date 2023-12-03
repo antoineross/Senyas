@@ -20,22 +20,18 @@ const labelMap = {
 
 // Define a drawing function
 export const makePrediction = async (scores, threshold, imgWidth, imgHeight, ctx) => {
-    console.log("Predicting...");
     // Clear the previous drawings/text
     ctx.clearRect(0, 0, imgWidth, imgHeight);
 
     const scoresArray = await scores.array();
-    console.log(scoresArray);
 
     const flattenedScores = [].concat(...scoresArray);
     // Find the maximum score and its index
     const maxScore = Math.max(...flattenedScores);
     const index = flattenedScores.indexOf(maxScore) + 1; // adding 1 because labelMap indices start from 1
 
-    console.log(maxScore);
-    console.log(index);
     const label = labelMap[index]['name'];
-    console.log("label", label)
+    console.log("Prediction Label: ", label)
     // Check if the maximum score is above the threshold
     // if (maxScore > threshold) {
     //     console.log(labelMap[index]['name']);
