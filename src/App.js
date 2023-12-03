@@ -40,7 +40,7 @@ function App() {
 
 
   const onResults = async (model) => {
-    if (typeof webcamRef.current !== "undefined" && webcamRef.current !== null && webcamRef.current.video.readyState === 4) {
+    if (typeof webcamRef.current !== "undefined" &&  webcamRef.current !== null && webcamRef.current.video.readyState === 4) {
       const video = webcamRef.current.video;
 
       const videoWidth = webcamRef.current.video.videoWidth;
@@ -78,7 +78,7 @@ function App() {
       // console.log(model.poseLandmarks)
       // Call the frameCount function to track frames and collect data
       if (framesData.length === 30){
-        frameCount(model, ctx);
+        frameCount(model, ctx, videoWidth, videoHeight);
       } else{
         const pose = model.poseLandmarks ? model.poseLandmarks.map(landmark => [landmark.x, landmark.y, landmark.z, landmark.visibility]).flat() : new Array(33*4).fill(0);
         const lh = model.leftHandLandmarks ? model.leftHandLandmarks.map(landmark => [landmark.x, landmark.y, landmark.z]).flat() : new Array(21*3).fill(0);
@@ -102,10 +102,10 @@ function App() {
 
     holistic.setOptions({
       modelComplexity: 1,
-      smoothLandmarks: true,
-      enableSegmentation: true,
-      smoothSegmentation: true,
-      refineFaceLandmarks: true,
+      smoothLandmarks: false,
+      enableSegmentation: false,
+      smoothSegmentation: false,
+      refineFaceLandmarks: false,
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5
     });
@@ -119,8 +119,8 @@ function App() {
           await holistic.send({ image: webcamRef.current.video })
           console.log("frames ", frameCounter);
         },
-        width: 1280,
-        height: 900
+        width: window.innerWidth,
+        height: window.innerHeight
       });
       camera.start();
     }
@@ -132,25 +132,31 @@ function getArrayShape(array) {
     return [array.length, array[0].length];
 }
 
-function frameCount(results, ctx) {
+function frameCount(results, ctx, videoWidth, videoHeight) {
     if (framesData.length === 30) {
-      // Process the collected 30 frames data
-      // console.log(getArrayShape(framesData));
-      processFramesData(framesData, ctx);
-      // Reset the framesData array
-      // console.log(framesData);
+      processFramesData(framesData, ctx, videoWidth, videoHeight);
       framesData.length = 0;
-      // console.log(framesData);
-
     }
   }
 
-async function processFramesData(framesData, ctx) {
+async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
+  
   const tensor = tf.tensor(framesData);
   const expanded = tensor.expandDims(0);
   // console.log(expanded.shape);
+  // Start time
+  const startTime = performance.now();
+
   const scores = net.predict(expanded);
-  const label = await makePrediction(scores, 0.8, 1280, 900, ctx)
+  const label = await makePrediction(scores, 0.8, videoWidth, videoHeight, ctx)
+
+  // End time
+  const endTime = performance.now();
+
+  // Calculate and log latency
+  const latency = endTime - startTime;
+  console.log(`Prediction latency: ${latency} milliseconds`);
+
   setLastPrediction(label);
   tf.dispose(tensor)
   tf.dispose(expanded)
@@ -158,8 +164,10 @@ async function processFramesData(framesData, ctx) {
 }
 
   return (
-    <div>Last prediction: {lastPrediction}
+    <div>
+      
       <div>
+      <h1 className="font-semibold text-4xl justify-center text-center items-center">Last prediction: {lastPrediction}</h1> 
       <Webcam
         ref={webcamRef}
         audio={false}
@@ -172,8 +180,12 @@ async function processFramesData(framesData, ctx) {
           right: 0,
           textAlign: "center",
           zindex: 9,
-          width: 1280,
-          height: 900
+          width: '75vw', // 80% of the viewport width
+          height: '50vw', // Keeping aspect ratio of 16:9
+          '@media (max-width: 600px)': { // Media query for smartphones
+              width: '90vw', // 9:16 aspect ratio
+              height: '80vh',
+          }
         }}
       />
 
@@ -187,8 +199,12 @@ async function processFramesData(framesData, ctx) {
           right: 0,
           textAlign: "center",
           zindex: 9,
-          width: 1280,
-          height: 900
+          width: '75vw', // 80% of the viewport width
+          height: '50vw', // Keeping aspect ratio of 16:9
+          '@media (max-width: 600px)': { // Media query for smartphones
+              width: '90vw', // 9:16 aspect ratio
+              height: '80vh',
+          }
         }}
         id="myCanvas"
       />
