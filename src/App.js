@@ -27,10 +27,23 @@ const labelMap = {
   15:{name:'Salamat', color:'purple'},
 }
 
+// Global error handler
+window.onerror = function (message, source, lineno, colno, error) {
+  console.log('A global error was caught:', message);
+  return true; // Prevents the default browser error handling
+};
+
+window.addEventListener('unhandledrejection', event => {
+  event.preventDefault();
+  console.log('Caught unhandled rejection:', event.reason);
+});
+
 const net = await tf.loadLayersModel('https://senyasfsltranslator.s3.jp-tok.cloud-object-storage.appdomain.cloud/model.json')
 net.summary();
 let frameCounter = 0;
 const framesData = [];
+let predictioncount = 0;
+let totalLatency = 0;
 
 function App() {
   const webcamRef = useRef(null);
@@ -39,8 +52,8 @@ function App() {
   var camera = null;
   const [lastPrediction, setLastPrediction] = useState(null);
   const [averageLatency, setAverageLatency] = useState(0);
-  let totalLatency = 0;
-  let predictionCount = 0;
+  const [predictionCount, setPredictionCount] = useState(0);
+  
   const [camHeight, setCamHeight] = useState(0);
   const [camWidth, setCamWidth] = useState(0);
 
@@ -162,11 +175,12 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
   // Calculate and log latency
   const latency = endTime - startTime;
   totalLatency += latency;
-  predictionCount++;
-  setAverageLatency(totalLatency / predictionCount);
+  predictioncount++;
+  setPredictionCount(predictioncount);
+  setAverageLatency(totalLatency / predictioncount);
 
   console.log(`Prediction latency: ${latency} milliseconds`);
-  console.log(`Average Prediction latency: ${totalLatency/predictionCount} milliseconds`);
+  console.log(`Average Prediction latency: ${totalLatency/predictioncount} milliseconds`);
 
   setLastPrediction(label);
   tf.dispose(tensor)
