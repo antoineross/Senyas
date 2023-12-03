@@ -164,10 +164,11 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
 }
 
   return (
+    <div className = "flex flex-col items-center">
+    <div className="flex justify-center items-center h-screen">
+      <h3 className="font-bold text-4xl text-center">Last prediction: {lastPrediction}</h3>
+    </div>      
     <div>
-      
-      <div>
-      <h1 className="font-semibold text-4xl justify-center text-center items-center">Last prediction: {lastPrediction}</h1> 
       <Webcam
         ref={webcamRef}
         audio={false}
@@ -183,8 +184,8 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
           width: '75vw', // 80% of the viewport width
           height: '50vw', // Keeping aspect ratio of 16:9
           '@media (max-width: 600px)': { // Media query for smartphones
-              width: '90vw', // 9:16 aspect ratio
-              height: '80vh',
+              width: '100vw', // 9:16 aspect ratio
+              height: '90vh',
           }
         }}
       />
@@ -201,9 +202,9 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
           zindex: 9,
           width: '75vw', // 80% of the viewport width
           height: '50vw', // Keeping aspect ratio of 16:9
-          '@media (max-width: 600px)': { // Media query for smartphones
-              width: '90vw', // 9:16 aspect ratio
-              height: '80vh',
+          '@media': { // Media query for smartphones
+              width: '100vw', // 9:16 aspect ratio
+              height: '90vh',
           }
         }}
         id="myCanvas"
