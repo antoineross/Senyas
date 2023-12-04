@@ -46,69 +46,70 @@ const framesData = [];
 let predictioncount = 0;
 let totalLatency = 0;
 
-const Sidebar = ({ onAppModeChange }) => {
+const Sidebar = ({ onAppModeChange, onDetectionConfidenceChange, onTrackingConfidenceChange, detectionConfidence, trackingConfidence }) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [appMode, setAppMode] = useState('About App'); // State for selected app mode
+  const [appMode, setAppMode] = useState('About App');
+  const handleDetectionConfidenceChange = (e) => {
+    onDetectionConfidenceChange(parseFloat(e.target.value));
+  };
 
+  // Function to handle tracking confidence change
+  const handleTrackingConfidenceChange = (e) => {
+    onTrackingConfidenceChange(parseFloat(e.target.value));
+  };
   const toggleSidebar = () => {
     setIsExpanded(!isExpanded);
   };
 
-
-const handleAppModeChange = (event) => {
-  setAppMode(event.target.value); // Update selected app mode
-};
+  const handleAppModeChange = (event) => {
+    onAppModeChange(event.target.value);
+    setAppMode(event.target.value); // Update selected app mode
+  };
 
   return (
     <div className={"sidebar"}>
+      
       <div className="dropdown">
         <h2>Senyas: Filipino Sign Language Translator solution</h2>
-        <h4>Parameters</h4>
         <div class="centered-content">
+                  {/* Main content area */}
           <select value={appMode} onChange={handleAppModeChange}>
             <option value="About App">About App</option>
             <option value="Run on Video">Run on Video</option>
             <option value="Add a video">Add a video</option>
           </select>
+        <h4>Parameters</h4>
         </div>
+        
       </div>
-      <ul>
-        <li>Menu Item 1</li>
-        <li>Menu Item 2</li>
-        <li>Menu Item 3</li>
-        {/* Add more menu items as needed */}
-      </ul>
-      <div className="content">
-        {/* Main content area */}
-        <button onClick={toggleSidebar}>Toggle Sidebar</button>
-        <h1>Main Content</h1>
-        {/* Render content based on app mode */}
-        {appMode === 'About App' && (
-          <div>
-            {/* About App content */}
-            <p>About App: Details here</p>
-          </div>
-        )}
-        {appMode === 'Run on Video' && (
-          <div>
-            {/* Run on Video content */}
-            <p>Run on Video: Details here</p>
-          </div>
-        )}
-        {appMode === 'Add a video' && (
-          <div>
-            {/* Add a video content */}
-            <p>Add a video: Details here</p>
-          </div>
-        )}
+      <div className="slider-container">
+        <h2>Detection Confidence</h2>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.1"
+          defaultValue="0.5"
+          onChange={handleDetectionConfidenceChange}
+        />
       </div>
+      <div className="slider-container">
+        <p>Min Detection Confidence: {detectionConfidence}</p>
+        <h2>Tracking Confidence</h2>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.1"
+          defaultValue="0.5"
+          onChange={handleTrackingConfidenceChange}
+        />
+        <p>Min Tracking Confidence: {trackingConfidence}</p>
       {/* ...rest of the sidebar content */}
+      </div>
     </div>
   );
 };
-
-
-
 
 function App() {
   const webcamRef = useRef(null);
@@ -123,10 +124,25 @@ function App() {
   const [camWidth, setCamWidth] = useState(0);
 
   const [appMode, setAppMode] = useState('About App');
+  const [detectionConfidence, setDetectionConfidence] = useState(0.5);
+  const [trackingConfidence, setTrackingConfidence] = useState(0.5);
 
   const handleAppModeChange = (selectedMode) => {
     setAppMode(selectedMode); // Update the app mode based on sidebar selection
   };
+
+  // Function to handle detection confidence change
+  const handleDetectionConfidenceChange = (value) => {
+    setDetectionConfidence(value);
+    // Add logic here for further actions on change if needed
+  };
+
+  // Function to handle tracking confidence change
+  const handleTrackingConfidenceChange = (value) => {
+    setTrackingConfidence(value);
+    // Add logic here for further actions on change if needed
+  };
+
 
   const onResults = async (model) => {
     if (typeof webcamRef.current !== "undefined" &&  webcamRef.current !== null && webcamRef.current.video.readyState === 4) {
@@ -214,8 +230,8 @@ function App() {
       enableSegmentation: false,
       smoothSegmentation: false,
       refineFaceLandmarks: false,
-      minDetectionConfidence: 0.5,
-      minTrackingConfidence: 0.5
+      minDetectionConfidence: detectionConfidence,
+      minTrackingConfidence: trackingConfidence
     });
   
     holistic.onResults(onResults);
@@ -275,64 +291,90 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
 }
 
   return (
-    <div className = "flex flex-col items-center justify-center">
-    <div className="flex justify-center items-center h-screen">
-      <Sidebar onAppModeChange={handleAppModeChange} />
-      <h6 style={{
-    fontWeight: 'medium',
-    fontSize: '1em',
-    textAlign: 'center',
-  }}
-  >Last prediction: {lastPrediction} </h6>
-<h6 style={{
-    fontWeight: 'medium',
-    fontSize: '0.8em',
-    textAlign: 'center',
-  }}>Avg. Prediction Latency: {averageLatency.toFixed(2)} ms @ {predictionCount} predicts</h6>
-    </div>
+    <div className = "App-header">
+      <Sidebar 
+              onAppModeChange={handleAppModeChange}
+              onDetectionConfidenceChange={handleDetectionConfidenceChange}
+              onTrackingConfidenceChange={handleTrackingConfidenceChange} 
+              detectionConfidence={detectionConfidence}
+              trackingConfidence={trackingConfidence}
+          />
+      <div className="content">
+          {/* Render content based on app mode */}
+          {appMode === 'About App' && (
+            <div>
+              {/* About App content */}
+              <h1>Senyas: Filipino Sign Language Translator Solution</h1>
+              <p>In this application we are using <b>MediaPipe</b> for to recognize Filipino sign language static and dynamic hand gestures. 
+              <b>ReactJS</b> is used to build the Web Graphical User Interface (GUI)</p>
+            </div>
+          )}
+          {appMode === 'Run on Video' && (
+          <div className= "App-header">
+            <h6 style={{
+              fontWeight: 'medium',
+              fontSize: '1em',
+              textAlign: 'center',
+            }}
+            >Last prediction: {lastPrediction} </h6>
+          <h6 style={{
+              fontWeight: 'medium',
+              fontSize: '0.8em',
+              textAlign: 'center',
+            }}>Avg. Prediction Latency: {averageLatency.toFixed(2)} ms @ {predictionCount} predicts</h6>
+          </div>
 
-    <div>
-      <Webcam
-        ref={webcamRef}
-        audio={false}
-        id="img"
-        style={{
-          position: "absolute",
-          marginLeft: "auto",
-          marginRight: "auto",
-          left: 0,
-          right: 0,
-          textAlign: "center",
-          zindex: 9,
-          width: {camWidth}, // 9:16 aspect ratio
-          height: {camHeight},
-          '@media': { // Media query for smartphones
-              width: {camWidth}, // 9:16 aspect ratio
-              height: {camHeight},
-          }
-        }}
-      />
-
-      <canvas
-        ref={canvasRef}
-        style={{
-          position: "absolute",
-          marginLeft: "auto",
-          marginRight: "auto",
-          left: 0,
-          right: 0,
-          textAlign: "center",
-          zindex: 9,
-          width: {camWidth}, // 9:16 aspect ratio
-          height: {camHeight},
-          '@media': { // Media query for smartphones
-              width: {camWidth}, // 9:16 aspect ratio
-              height: {camHeight},
-          }
-        }}
-        id="myCanvas"
-      />
-    </div>
+          )}
+          {appMode === 'Add a video' && (
+            <div>
+              {/* Add a video content */}
+              <p>Add a video: Details here</p>
+            </div>
+          )}
+      </div>
+      <div>
+        <Webcam
+          ref={webcamRef}
+          audio={false}
+          id="img"
+          style={{
+            backgroundColor: "000000",
+            position: "absolute",
+            marginLeft: "auto",
+            marginRight: "auto",
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            zindex: 9,
+            width: {camWidth}, // 9:16 aspect ratio
+            height: {camHeight},
+            '@media': { // Media query for smartphones
+                width: {camWidth}, // 9:16 aspect ratio
+                height: {camHeight},
+            }
+          }}
+        />
+        <canvas
+          ref={canvasRef}
+          style={{
+            position: "absolute",
+            marginLeft: "auto",
+            marginRight: "auto",
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            zindex: 9,
+            backgroundColor: "000000",
+            width: {camWidth}, // 9:16 aspect ratio
+            height: {camHeight},
+            '@media': { // Media query for smartphones
+                width: {camWidth}, // 9:16 aspect ratio
+                height: {camHeight},
+            }
+          }}
+          id="myCanvas"
+        />
+      </div>
     </div>
     
 
