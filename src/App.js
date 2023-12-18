@@ -9,6 +9,7 @@ import { makePrediction } from "./utilities";
 
 import * as tf from "@tensorflow/tfjs";
 import { nextFrame } from "@tensorflow/tfjs";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const labelMap = {
   1:{name:'Ako', color:'red'},
@@ -292,6 +293,7 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
 
   return (
     <div className = "App-header">
+      <SpeedInsights />
       <Sidebar 
               onAppModeChange={handleAppModeChange}
               onDetectionConfidenceChange={handleDetectionConfidenceChange}

@@ -3,12 +3,11 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { SpeedInsights } from "@vercel/speed-insights/next"
 
 ReactDOM.render(
   <React.StrictMode>
     <App />
-    <SpeedInsights />
+    
   </React.StrictMode>,
   document.getElementById('root')
 );
