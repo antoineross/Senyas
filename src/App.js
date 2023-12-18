@@ -9,7 +9,7 @@ import { makePrediction } from "./utilities";
 
 import * as tf from "@tensorflow/tfjs";
 import { nextFrame } from "@tensorflow/tfjs";
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 const labelMap = {
   1:{name:'Ako', color:'red'},
