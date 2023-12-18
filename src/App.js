@@ -48,8 +48,10 @@ let predictioncount = 0;
 let totalLatency = 0;
 
 const Sidebar = ({ onAppModeChange, onDetectionConfidenceChange, onTrackingConfidenceChange, detectionConfidence, trackingConfidence }) => {
+  // State of the application
   const [isExpanded, setIsExpanded] = useState(true);
   const [appMode, setAppMode] = useState('About App');
+
   const handleDetectionConfidenceChange = (e) => {
     onDetectionConfidenceChange(parseFloat(e.target.value));
   };
@@ -66,25 +68,30 @@ const Sidebar = ({ onAppModeChange, onDetectionConfidenceChange, onTrackingConfi
     onAppModeChange(event.target.value);
     setAppMode(event.target.value); // Update selected app mode
   };
+  
+  const sidebarClass = isExpanded ? "sidebar" : "sidebar-hidden";
 
   return (
-    <div className={"sidebar"}>
-      
+    <div>
+    <div>
+      <button className ='expand-button' onClick={toggleSidebar}>
+        {isExpanded ? "Hide" : "Show"}
+      </button>
+    </div>
+    <div className={sidebarClass}>
       <div className="dropdown">
         <h2>Senyas: Filipino Sign Language Translator solution</h2>
-        <div class="centered-content">
-                  {/* Main content area */}
+        <div className="centered-content">
           <select value={appMode} onChange={handleAppModeChange}>
             <option value="About App">About App</option>
             <option value="Run on Video">Run on Video</option>
             <option value="Add a video">Add a video</option>
           </select>
-        <h4>Parameters</h4>
         </div>
-        
       </div>
+      <h4>Parameters</h4>
       <div className="slider-container">
-        <h2>Detection Confidence</h2>
+        <h3>Detection Confidence</h3>
         <input
           type="range"
           min="0"
@@ -96,7 +103,7 @@ const Sidebar = ({ onAppModeChange, onDetectionConfidenceChange, onTrackingConfi
       </div>
       <div className="slider-container">
         <p>Min Detection Confidence: {detectionConfidence}</p>
-        <h2>Tracking Confidence</h2>
+        <h3>Tracking Confidence</h3>
         <input
           type="range"
           min="0"
@@ -106,8 +113,8 @@ const Sidebar = ({ onAppModeChange, onDetectionConfidenceChange, onTrackingConfi
           onChange={handleTrackingConfidenceChange}
         />
         <p>Min Tracking Confidence: {trackingConfidence}</p>
-      {/* ...rest of the sidebar content */}
       </div>
+    </div>
     </div>
   );
 };
@@ -115,7 +122,7 @@ const Sidebar = ({ onAppModeChange, onDetectionConfidenceChange, onTrackingConfi
 function App() {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
-  const connect = window.drawConnectors;
+
   var camera = null;
   const [lastPrediction, setLastPrediction] = useState(null);
   const [averageLatency, setAverageLatency] = useState(0);
@@ -144,11 +151,9 @@ function App() {
     // Add logic here for further actions on change if needed
   };
 
-
+  
   const onResults = async (model) => {
     if (typeof webcamRef.current !== "undefined" &&  webcamRef.current !== null && webcamRef.current.video.readyState === 4) {
-      const video = webcamRef.current.video;
-
       const videoWidth = webcamRef.current.video.videoWidth;
       const videoHeight = webcamRef.current.video.videoHeight;
       
@@ -197,7 +202,6 @@ function App() {
         
         framesData.push(frameData);
       }
-      
       ctx.restore();
     }
   };
@@ -205,6 +209,7 @@ function App() {
 
 
   useEffect(() => {
+    if (appMode === 'Run on Video') {
     const getCameraStream = async () => {
       try {
         // Use generic media constraints
@@ -236,60 +241,59 @@ function App() {
     });
   
     holistic.onResults(onResults);
-  
-    if (typeof webcamRef.current !== "undefined" && webcamRef.current !== null) {
-      camera = new cam.Camera(webcamRef.current.video, {
-        onFrame: async () => {
-          frameCounter++;
-          await holistic.send({ image: webcamRef.current.video });
-        },
-        width: window.innerWidth,
-        height: window.innerHeight
-      });
-      camera.start();
-    }
-  }, []);
-  
-function getArrayShape(array) {
-    return [array.length, array[0].length];
-}
+    if (typeof webcamRef.current !== "undefined" && webcamRef.current !== null && webcamRef.current.video) {
+      try{
+        camera = new cam.Camera(webcamRef.current.video, {
+          onFrame: async () => {
+            frameCounter++;
+            await holistic.send({ image: webcamRef.current.video });
+          },
+          width: window.innerWidth,
+          height: window.innerHeight
+        });
+        camera.start();
+    } catch (err) {
+      console.error("Error starting the camera: ", err);
+      }
+    } 
+  }}, [appMode]);
 
-function frameCount(results, ctx, videoWidth, videoHeight) {
-    if (framesData.length === 30) {
-      processFramesData(framesData, ctx, videoWidth, videoHeight);
-      framesData.length = 0;
+  function frameCount(results, ctx, videoWidth, videoHeight) {
+      if (framesData.length === 30) {
+        processFramesData(framesData, ctx, videoWidth, videoHeight);
+        framesData.length = 0;
+      }
     }
+
+  async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
+    
+    const tensor = tf.tensor(framesData);
+    const expanded = tensor.expandDims(0);
+    // console.log(expanded.shape);
+    // Start time
+    const startTime = performance.now();
+
+    const scores = net.predict(expanded);
+    const label = await makePrediction(scores, 0.8, videoWidth, videoHeight, ctx)
+
+    // End time
+    const endTime = performance.now();
+
+    // Calculate and log latency
+    const latency = endTime - startTime;
+    totalLatency += latency;
+    predictioncount++;
+    setPredictionCount(predictioncount);
+    setAverageLatency(totalLatency / predictioncount);
+
+    //console.log(`Prediction latency: ${latency} milliseconds`);
+    //console.log(`Average Prediction latency: ${totalLatency/predictioncount} milliseconds`);
+
+    setLastPrediction(label);
+    tf.dispose(tensor)
+    tf.dispose(expanded)
+    tf.dispose(scores)
   }
-
-async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
-  
-  const tensor = tf.tensor(framesData);
-  const expanded = tensor.expandDims(0);
-  // console.log(expanded.shape);
-  // Start time
-  const startTime = performance.now();
-
-  const scores = net.predict(expanded);
-  const label = await makePrediction(scores, 0.8, videoWidth, videoHeight, ctx)
-
-  // End time
-  const endTime = performance.now();
-
-  // Calculate and log latency
-  const latency = endTime - startTime;
-  totalLatency += latency;
-  predictioncount++;
-  setPredictionCount(predictioncount);
-  setAverageLatency(totalLatency / predictioncount);
-
-  console.log(`Prediction latency: ${latency} milliseconds`);
-  console.log(`Average Prediction latency: ${totalLatency/predictioncount} milliseconds`);
-
-  setLastPrediction(label);
-  tf.dispose(tensor)
-  tf.dispose(expanded)
-  tf.dispose(scores)
-}
 
   return (
     <div className = "App-header">
@@ -302,84 +306,62 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
               trackingConfidence={trackingConfidence}
           />
       <div className="content">
-          {/* Render content based on app mode */}
           {appMode === 'About App' && (
             <div>
-              {/* About App content */}
               <h1>Senyas: Filipino Sign Language Translator Solution</h1>
               <p>In this application we are using <b>MediaPipe</b> for to recognize Filipino sign language static and dynamic hand gestures. 
               <b>ReactJS</b> is used to build the Web Graphical User Interface (GUI)</p>
             </div>
           )}
           {appMode === 'Run on Video' && (
-          <div className= "App-header">
-            <h6 style={{
-              fontWeight: 'medium',
-              fontSize: '1em',
-              textAlign: 'center',
-            }}
-            >Last prediction: {lastPrediction} </h6>
-          <h6 style={{
-              fontWeight: 'medium',
-              fontSize: '0.8em',
-              textAlign: 'center',
-            }}>Avg. Prediction Latency: {averageLatency.toFixed(2)} ms @ {predictionCount} predicts</h6>
+          <div>
+          <div>
+          <h4>Avg. Prediction Latency: {averageLatency.toFixed(2)} ms @ {predictionCount} predicts</h4>
           </div>
-
+          <div className='content-wrapper'>
+          <Webcam
+            ref={webcamRef}
+            audio={false}
+            id="img"
+            className="centered-element"
+            style={{
+              backgroundColor: "000000",
+              width: {camWidth}, // 9:16 aspect ratio
+              height: {camHeight},
+              '@media': { // Media query for smartphones
+                  width: {camWidth}, // 9:16 aspect ratio
+                  height: {camHeight},
+              }
+            }}
+          />
+          <canvas
+            ref={canvasRef}
+            className="centered-element"
+            style={{
+              backgroundColor: "000000",
+              width: {camWidth}, // 9:16 aspect ratio
+              height: {camHeight},
+              '@media': { // Media query for smartphones
+                  width: {camWidth}, // 9:16 aspect ratio
+                  height: {camHeight},
+              }
+            }}
+            id="myCanvas"
+          />
+          </div>
+          <div className='below-video' style={{marginTop: `${camHeight}px`}}>
+            <p> video </p>
+            <h4> Last prediction: {lastPrediction} </h4>
+          </div>
+        </div>
           )}
           {appMode === 'Add a video' && (
             <div>
-              {/* Add a video content */}
               <p>Add a video: Details here</p>
             </div>
           )}
       </div>
-      <div>
-        <Webcam
-          ref={webcamRef}
-          audio={false}
-          id="img"
-          style={{
-            backgroundColor: "000000",
-            position: "absolute",
-            marginLeft: "auto",
-            marginRight: "auto",
-            left: 0,
-            right: 0,
-            textAlign: "center",
-            zindex: 9,
-            width: {camWidth}, // 9:16 aspect ratio
-            height: {camHeight},
-            '@media': { // Media query for smartphones
-                width: {camWidth}, // 9:16 aspect ratio
-                height: {camHeight},
-            }
-          }}
-        />
-        <canvas
-          ref={canvasRef}
-          style={{
-            position: "absolute",
-            marginLeft: "auto",
-            marginRight: "auto",
-            left: 0,
-            right: 0,
-            textAlign: "center",
-            zindex: 9,
-            backgroundColor: "000000",
-            width: {camWidth}, // 9:16 aspect ratio
-            height: {camHeight},
-            '@media': { // Media query for smartphones
-                width: {camWidth}, // 9:16 aspect ratio
-                height: {camHeight},
-            }
-          }}
-          id="myCanvas"
-        />
-      </div>
     </div>
-    
-
   );
 }
 

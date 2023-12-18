@@ -1,12 +1,3 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
@@ -18,8 +9,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  color: #fafafa
+  color: #fafafa;
+  height: 100vh;
 }
 
 .App-header .h6 {
@@ -28,9 +19,37 @@
   text-align: center;
 }
 
-
 .App-link {
   color: #61dafb;
+}
+
+.expand-button {
+  position: fixed;
+  bottom: 20px; /* Adjust the distance from the bottom */
+  left: 20px; /* Adjust the distance from the left */
+  z-index: 1001; /* Ensure it's above the sidebar */
+  padding: 3px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #000000;
+  appearance: none; /* Removes default dropdown arrow in some browsers */
+  color: #fafafa;
+  margin: 20px auto; /* Center the container and provide some space */
+}
+
+.expand-button:hover {
+  background-color: #2b2b2b;
+}
+
+.content-wrapper {
+  align-items: center;
+}
+
+.centered-element {
+  position:absolute;
+  left: 35%;
+  z-index: 9;
 }
 
 .sidebar {
@@ -41,16 +60,53 @@
   width: 300px; /* Or any preferred width */
   background-color: #000000;
   color: #fafafa;
-  transition: width 0.3s ease; /* Smooth transition for width change */
+  transition: width 0.6s ease; /* Smooth transition for width change */
   z-index: 1000; /* Ensure it's above other content */
   /* Additional styling as needed */
 }
 
+.sidebar button:hover {
+  background-color: #2b2b2b;
+}
+
+.sidebar-hidden{
+  position: fixed;
+  top: 0;
+  left: -150px;
+  height: 100%;
+  width: 0px; /* Or any preferred width */
+  background-color: #000000;
+  color: #fafafa;
+  transition: width 0.6s ease; /* Smooth transition for width change */
+}
+
+.sidebar-hidden button {
+  width: 30%;
+  padding: 3px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #000000;
+  appearance: none; /* Removes default dropdown arrow in some browsers */
+  color: #fafafa;
+  margin: 20px auto; /* Center the container and provide some space */
+}
+
+.centered-content {
+  display: flex;
+  height: 100%; /* Optional: Adjust the height if needed */
+}
+
 .dropdown {
-  width: 250px;
+  padding: 10px;
   background-color: #000000;
   color: #fafafa;
   transition: all 0.3s ease; /* Add smooth transition for width change */
+  justify-content: center;
+}
+
+.dropdown select:hover {
+  background-color: #2b2b2b;
 }
 
 .dropdown select {
@@ -71,20 +127,6 @@
   outline: none; /* Remove focus outline */
   border-color: #555;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-}
-
-.sidebar-header h2 {
-  margin-bottom: 10px;
-}
-
-.sidebar ul {
-  list-style: none;
-  padding: 0;
-}
-
-.sidebar ul li {
-  padding: 10px;
-  cursor: pointer;
 }
 
 .slider-container {
@@ -111,9 +153,14 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .content {
-  flex: 1;
-  padding: 20px;
-  margin: 20px auto; /* Center the container and provide some space */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.below-video {
+  margin-top: 20px; /* Adjust this margin as needed */
+  /* Other styles for your next <div> */
 }
 
 @keyframes App-logo-spin {
