@@ -24,7 +24,7 @@
 }
 
 .expand-button {
-  position: fixed;
+  position: top;
   bottom: 20px; /* Adjust the distance from the bottom */
   left: 20px; /* Adjust the distance from the left */
   z-index: 1001; /* Ensure it's above the sidebar */
