@@ -1,6 +1,6 @@
 // Define our labelmap
 // array(['ako',  'bakit', 'F', 'hi', 'hindi', 'ikaw',  'kamusta', 'L', 'maganda', 'magandang umaga', 'N', 'O', 'oo', 'P', 'salamat'])
-const labelMap = {
+export const labelMap = {
     1:{name:'Ako', color:'red'},
     2:{name:'Bakit', color:'yellow'},
     3:{name:'F', color:'lime'},

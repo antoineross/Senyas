@@ -1,45 +1,25 @@
-import React, { useState, useEffect, useRef } from 'react';
 import Webcam from 'react-webcam';
-import * as cam from '@mediapipe/camera_utils';
-import * as controls from '@mediapipe/control_utils';
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
-import * as holistics from '@mediapipe/holistic';
-import { makePrediction } from "./utilities"; 
+import { labelMap, makePrediction } from "../components/utilities"; 
 
 import * as tf from "@tensorflow/tfjs";
 import { nextFrame } from "@tensorflow/tfjs";
 
-const labelMap = {
-  1:{name:'Ako', color:'red'},
-  2:{name:'Bakit', color:'yellow'},
-  3:{name:'F', color:'lime'},
-  4:{name:'Hi', color:'blue'},
-  5:{name:'Hindi', color:'purple'},
-  6:{name:'Ikaw', color:'red'},
-  7:{name:'Kamusta', color:'yellow'},
-  8:{name:'L', color:'lime'},
-  9:{name:'Maganda', color:'blue'},
-  10:{name:'Magandang Umaga', color:'purple'},
-  11:{name:'N', color:'red'},
-  12:{name:'O', color:'yellow'},
-  13:{name:'Oo', color:'lime'},
-  14:{name:'P', color:'blue'},
-  15:{name:'Salamat', color:'purple'},
+import React, { useState, useEffect, useRef, Suspense } from 'react';
+
+import * as cam from '@mediapipe/camera_utils';
+import * as controls from '@mediapipe/control_utils';
+import * as holistics from '@mediapipe/holistic';
+import * as drawingUtils from '@mediapipe/drawing_utils';
+import './App.css';
+
+import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
+
+let Webcam2;
+if (ExecutionEnvironment.canUseDOM) {
+  Webcam2 = require('react-webcam').default;
 }
 
-// Global error handler
-window.onerror = function (message, source, lineno, colno, error) {
-  console.log('A global error was caught:', message);
-  return true; // Prevents the default browser error handling
-};
-
-window.addEventListener('unhandledrejection', event => {
-  event.preventDefault();
-  console.log('Caught unhandled rejection:', event.reason);
-});
-
-const net = await tf.loadLayersModel('https://senyasfsltranslator.s3.jp-tok.cloud-object-storage.appdomain.cloud/model.json')
-net.summary();
 let frameCounter = 0;
 const framesData = [];
 let predictioncount = 0;
@@ -48,14 +28,38 @@ let totalLatency = 0;
 function App() {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
-  const connect = window.drawConnectors;
-  var camera = null;
+  const netRef = useRef(null);
   const [lastPrediction, setLastPrediction] = useState(null);
   const [averageLatency, setAverageLatency] = useState(0);
   const [predictionCount, setPredictionCount] = useState(0);
-  
   const [camHeight, setCamHeight] = useState(0);
   const [camWidth, setCamWidth] = useState(0);
+
+  useEffect(() => {
+    // Load TensorFlow Model in the client-side environment
+    const loadModel = async () => {
+      netRef.current = await tf.loadLayersModel('https://senyasfsltranslator.s3.jp-tok.cloud-object-storage.appdomain.cloud/model.json');
+      netRef.current.summary();
+    };
+
+    if (typeof window !== 'undefined') {
+      loadModel();
+      // Setup window error handlers
+      window.onerror = function (message, source, lineno, colno, error) {
+        console.log('A global error was caught:', message);
+        return true;
+      };
+
+      window.addEventListener('unhandledrejection', event => {
+        event.preventDefault();
+        console.log('Caught unhandled rejection:', event.reason);
+      });
+    }
+  }, []);
+
+
+  var camera = null;
+
 
 
   const onResults = async (model) => {
@@ -118,21 +122,23 @@ function App() {
 
 
   useEffect(() => {
-    const getCameraStream = async () => {
-      try {
-        // Use generic media constraints
-        const constraints = { video: true };
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-  
-        if (webcamRef.current) {
-          webcamRef.current.srcObject = stream;
+    // Camera stream and other browser-specific operations
+    if (typeof window !== 'undefined') {
+      const getCameraStream = async () => {
+        try {
+          const constraints = { video: true };
+          const stream = await navigator.mediaDevices.getUserMedia(constraints);
+          if (webcamRef.current) {
+            webcamRef.current.srcObject = stream;
+          }
+        } catch (err) {
+          console.error("Error accessing the camera: ", err);
         }
-      } catch (err) {
-        console.error("Error accessing the camera: ", err);
-      }
-    };
-  
-    getCameraStream();
+      };
+
+      getCameraStream();
+    }
+
   
     const holistic = new holistics.Holistic({locateFile: (file) => {
       return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
@@ -150,7 +156,7 @@ function App() {
   
     holistic.onResults(onResults);
   
-    if (typeof webcamRef.current !== "undefined" && webcamRef.current !== null) {
+    if (typeof window !== 'undefined' && typeof webcamRef.current !== "undefined" && webcamRef.current !== null) {
       camera = new cam.Camera(webcamRef.current.video, {
         onFrame: async () => {
           frameCounter++;
@@ -182,7 +188,7 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
   // Start time
   const startTime = performance.now();
 
-  const scores = net.predict(expanded);
+  const scores = netRef.current.predict(expanded);
   const label = await makePrediction(scores, 0.8, videoWidth, videoHeight, ctx)
 
   // End time
@@ -204,24 +210,18 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
   tf.dispose(scores)
 }
 
-  return (
-    <div className = "flex flex-col items-center justify-center">
-    <div className="flex justify-center items-center h-screen">
-      <h6 style={{
-    fontWeight: 'medium',
-    fontSize: '1em',
-    textAlign: 'center',
-  }}
-  >Last prediction: {lastPrediction} </h6>
-<h6 style={{
-    fontWeight: 'medium',
-    fontSize: '0.8em',
-    textAlign: 'center',
-  }}>Avg. Prediction Latency: {averageLatency.toFixed(2)} ms @ {predictionCount} predicts</h6>
 
-    </div>      
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+  <div className="flexStyle">
+  <div className="flexInnerStyle">
+    <h6 className="h6Style">Last prediction: {lastPrediction}</h6>
+    <h6 className="h6SmallStyle">Avg. Prediction Latency: {averageLatency.toFixed(2)} ms @ {predictionCount} predicts</h6>
+  </div>      
+  <div>    
     <div>
-      <Webcam
+    <Webcam
         ref={webcamRef}
         audio={false}
         id="img"
@@ -254,17 +254,13 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
           zindex: 9,
           width: {camWidth}, // 9:16 aspect ratio
           height: {camHeight},
-          '@media': { // Media query for smartphones
-              width: {camWidth}, // 9:16 aspect ratio
-              height: {camHeight},
-          }
         }}
         id="myCanvas"
       />
     </div>
     </div>
-    
-
+    </div>
+    </Suspense>
   );
 }
 
