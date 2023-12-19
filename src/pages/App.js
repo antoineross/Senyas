@@ -20,6 +20,11 @@ if (ExecutionEnvironment.canUseDOM) {
   Webcam2 = require('react-webcam').default;
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
 let frameCounter = 0;
 const framesData = [];
 let predictioncount = 0;
@@ -201,15 +206,14 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
   setPredictionCount(predictioncount);
   setAverageLatency(totalLatency / predictioncount);
 
-  console.log(`Prediction latency: ${latency} milliseconds`);
-  console.log(`Average Prediction latency: ${totalLatency/predictioncount} milliseconds`);
-
   setLastPrediction(label);
-  tf.dispose(tensor)
-  tf.dispose(expanded)
-  tf.dispose(scores)
-  // Sleep for 0.5 seconds
-  await new Promise(resolve => setTimeout(resolve, 500));
+  tf.dispose(tensor);
+  tf.dispose(expanded);
+  tf.dispose(scores);
+
+  // Sleep for 500 ms
+  await sleep(500);
+  
 }
 
 
