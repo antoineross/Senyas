@@ -213,13 +213,22 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
 
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-  <div className="flexStyle">
-  <div className="flexInnerStyle">
-    <h6 className="h6Style">Last prediction: {lastPrediction}</h6>
-    <h6 className="h6SmallStyle">Avg. Prediction Latency: {averageLatency.toFixed(2)} ms @ {predictionCount} predicts</h6>
-  </div>      
-  <div>    
+    <div className = "flex flex-col items-center justify-center">
+    <div className="flex justify-center items-center h-screen">
+      <h6 style={{
+    fontWeight: 'medium',
+    fontSize: '1em',
+    textAlign: 'center',
+  }}
+  >Last prediction: {lastPrediction} </h6>
+<h6 style={{
+    fontWeight: 'medium',
+    fontSize: '0.8em',
+    textAlign: 'center',
+  }}>Avg. Prediction Latency: {averageLatency.toFixed(2)} ms @ {predictionCount} predicts</h6>
+
+    </div>      
+    <div> 
     <div>
     <Webcam
         ref={webcamRef}
@@ -260,7 +269,6 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
     </div>
     </div>
     </div>
-    </Suspense>
   );
 }
 
