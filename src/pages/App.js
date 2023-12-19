@@ -160,18 +160,30 @@ function App() {
     });
   
     holistic.onResults(onResults);
+    let localCamera = null;
   
     if (typeof window !== 'undefined' && typeof webcamRef.current !== "undefined" && webcamRef.current !== null) {
-      camera = new cam.Camera(webcamRef.current.video, {
+      localCamera = new cam.Camera(webcamRef.current.video, {
         onFrame: async () => {
-          frameCounter++;
-          await holistic.send({ image: webcamRef.current.video });
+          try {
+            frameCounter++;
+            await holistic.send({ image: webcamRef.current.video });
+          } catch (error) {
+            // Do nothing
+          }
         },
         width: window.innerWidth,
         height: window.innerHeight
       });
-      camera.start();
+      localCamera.start();
     }
+    // Return a cleanup function
+    return () => {
+        // Stop the camera
+        if (localCamera) {
+            localCamera.stop();
+        }
+      };
   }, []);
   
 function getArrayShape(array) {

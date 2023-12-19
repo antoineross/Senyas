@@ -2,9 +2,11 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# Overview
 
-Let's discover **Docusaurus in less than 5 minutes**.
+Senyas is an **open-source** Application that enables you to **translate Filipino Sign Language into text**. 
+
+This is a project made as part of a thesis project by Antoine Ross Oropesa and Gallen Leslei Felicen.
 
 ## Getting Started
 
