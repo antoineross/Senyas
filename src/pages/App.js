@@ -208,6 +208,8 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
   tf.dispose(tensor)
   tf.dispose(expanded)
   tf.dispose(scores)
+  // Sleep for 0.5 seconds
+  await new Promise(resolve => setTimeout(resolve, 500));
 }
 
 
