@@ -43,7 +43,7 @@ function App() {
   useEffect(() => {
     // Load TensorFlow Model in the client-side environment
     const loadModel = async () => {
-      netRef.current = await tf.loadLayersModel('https://senyasfsltranslator.s3.jp-tok.cloud-object-storage.appdomain.cloud/model.json');
+      netRef.current = await tf.loadLayersModel('https://senyasfsltranslatorv2.s3.jp-tok.cloud-object-storage.appdomain.cloud/model.json');
       netRef.current.summary();
     };
 
