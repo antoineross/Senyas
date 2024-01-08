@@ -80,6 +80,11 @@ const config = {
             label: 'GitHub',
             position: 'right',
           },
+          {
+            href: 'https://forms.gle/19f14pt73HnZtrRP8',
+            label: 'Give Feedback',
+            position: 'right',
+          },
         ],
       },
       prism: {
