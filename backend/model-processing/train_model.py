@@ -92,4 +92,4 @@ def modelToTFJS(model, modelName):
     output_dir = '' # edit this to change the output directory
     tfjs.converters.save_keras_model(model, output_dir)
     
-# modelToTFJS(model, modelName)
+modelToTFJS(model, modelName)

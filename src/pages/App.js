@@ -131,7 +131,12 @@ function App() {
     if (typeof window !== 'undefined') {
       const getCameraStream = async () => {
         try {
-          const constraints = { video: true };
+          // Updated constraints to request the front camera
+          const constraints = {
+            video: {
+              facingMode: 'user' // Request the front camera
+            }};
+          // const constraints = { video: true };
           const stream = await navigator.mediaDevices.getUserMedia(constraints);
           if (webcamRef.current) {
             webcamRef.current.srcObject = stream;
@@ -227,8 +232,6 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
   await sleep(500);
   
 }
-
-
 
   return (
     <div className = "flex flex-col items-center justify-center">
