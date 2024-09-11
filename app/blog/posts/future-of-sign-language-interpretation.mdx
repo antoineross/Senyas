@@ -1,0 +1,28 @@
+---
+title: 'the future of sign language interpretation'
+publishedAt: '2024-01-04'
+summary: 'an exploration of how cnn-lstm architecture enhances the recognition of filipino sign language gestures in real-time applications.'
+---
+
+### Limitations of SENYAS
+While SENYAS successfully addressed the need for a Filipino Sign Language (FSL) recognition system, several limitations were encountered during development:
+
+1. **Limited Dataset**: 
+   - The lack of a publicly accessible FSL dataset meant the researchers had to create their own dataset. This process was time-consuming, and the dataset was relatively small, consisting of only 10 dynamic and 5 static gestures.
+   - Regional variations of FSL, such as those from Southern Luzon or Eastern Visayas, were not represented, meaning the model may not generalize well to these dialects.
+
+2. **Restricted Sign Categories**:
+   - The system is limited to detecting individual signs, rather than full sentences or phrases, which limits its utility in real-world conversations.
+   - Only hand and pose landmarks were used for gesture recognition, and facial landmarks were omitted to keep the model lightweight, but this reduces accuracy for signs that involve facial expressions.
+
+3. **Web Application Constraints**:
+   - The application is currently hosted on a cloud server in Japan, which could introduce latency issues for users in the Philippines, especially in areas with unstable internet connectivity.
+
+### Moving Forward
+To enhance the SENYAS system, the following steps could be taken:
+1. **Expanding the Dataset**: A larger, more diverse dataset including regional dialects and additional gestures would make the model more robust and versatile.
+2. **Improving Gesture Range**: By expanding the system to recognize complete phrases and sentences, SENYAS could be used in a wider range of scenarios, such as interpreting conversations in real time.
+3. **Face and Gesture Integration**: Future iterations of the model could include facial landmarks to improve accuracy for signs that rely heavily on facial expressions.
+4. **Optimizing the Web Application**: Hosting the application on local servers would minimize latency and improve the user experience for those in the Philippines.
+
+By addressing these limitations, SENYAS can become an even more powerful tool for FSL recognition and expand its impact within the deaf community.

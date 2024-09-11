@@ -1,0 +1,26 @@
+---
+title: 'designing a real-time sign language recognition system'
+publishedAt: '2023-09-20'
+summary: 'An exploration of how CNN-LSTM architecture enhances the recognition of Filipino Sign Language gestures in real-time applications.'
+---
+
+### Initial Design Goal
+The goal of the SENYAS project was clear: to develop a real-time system that could recognize both static and dynamic Filipino Sign Language (FSL) gestures. FSL involves complex hand movements and facial expressions, which can be difficult for traditional machine learning models to interpret accurately. To capture this complexity, SENYAS needed a system that could process both spatial and temporal information.
+
+### Why Choose CNN-LSTM?
+CNN-LSTM was chosen for its ability to handle both spatial and temporal data. Here’s why:
+- **CNN (Convolutional Neural Networks)** is excellent at extracting spatial features like hand shapes and gestures from video frames.
+- **LSTM (Long Short-Term Memory)** networks are ideal for capturing temporal dependencies, meaning they can understand the sequence of movements over time, which is critical for dynamic sign language.
+
+This hybrid model allowed SENYAS to focus on real-time video input and predict hand gestures accurately. The CNN extracted the spatial features from the hand landmarks, while the LSTM processed these features over time to understand gestures that involve movement.
+
+### How It Worked
+Through experimentation with five different CNN-LSTM models, the SENYAS system achieved outstanding results. The best model, CNN-MP-LSTM, had:
+- **98% training accuracy**
+- **377-microsecond prediction speed**
+- **0.92 scores for precision, recall, and F1-Score**
+
+The model could recognize dynamic gestures like “ikaw” (you) and static gestures like letters with high accuracy, showcasing the effectiveness of this design choice.
+
+---
+

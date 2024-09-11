@@ -1,0 +1,32 @@
+---
+title: 'complete overview of the project'
+publishedAt: '2023-09-04'
+summary: 'our thesis on how we built a filipino sign language recognition model for both static and dynamic hand gestures using mediapipe extracted landmarks.'
+---
+
+## Overview
+SENYAS is a real-time Filipino Sign Language (FSL) recognition system developed using MediaPipe and CNN-LSTM architectures. This application aims to bridge communication gaps between the Filipino deaf community and non-signers by recognizing hand gestures in FSL and converting them to text.
+
+## Key Features
+- **Real-time Recognition**: Utilizes computer vision and deep learning to convert FSL gestures from video input into text output.
+- **MediaPipe**: Extracts essential landmarks for hand and pose gestures, simplifying input complexity.
+- **CNN-LSTM Architecture**: Combines Convolutional Neural Networks (CNNs) for spatial feature extraction and Long Short-Term Memory (LSTM) networks for temporal dependencies in hand gestures.
+- **Performance**: The best-performing model, CNN-MP-LSTM, achieved 98% training accuracy and a 0.92 score on key performance metrics such as precision, recall, and F1-score.
+
+## Model Comparisons
+The study evaluated five different CNN-LSTM models, comparing their performance on:
+1. **Prediction Speed**: CNN-MP-LSTM averaged 377.08 microseconds per prediction.
+2. **Accuracy**: Achieved weighted accuracy of 86% in real-world scenarios.
+3. **Metrics**: Precision, recall, and F1-score consistently exceeded 0.90.
+
+## Dataset and Training
+- A custom dataset was developed, including 10 dynamic and 5 static FSL gestures.
+- Data augmentation techniques, such as horizontal flipping and zooming, expanded the dataset for training.
+- Landmarks were extracted using MediaPipe, creating numpy arrays for model input.
+
+## Application Deployment
+- **Web-based**: Hosted on Vercel, making the application accessible via web browsers.
+- **TensorFlow.js Integration**: Allows for real-time gesture recognition on mobile and desktop devices.
+
+## Conclusion
+SENYAS offers a viable alternative to human interpreters, fostering inclusivity for the Filipino deaf community by enabling real-time sign language recognition.

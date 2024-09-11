@@ -11,6 +11,9 @@ importers:
       '@google-cloud/storage':
         specifier: ^7.12.1
         version: 7.12.1
+      '@mediapipe/camera_utils':
+        specifier: ^0.3.1675466862
+        version: 0.3.1675466862
       '@mediapipe/drawing_utils':
         specifier: ^0.3.1675466124
         version: 0.3.1675466124
@@ -41,6 +44,9 @@ importers:
       geist:
         specifier: 1.2.2
         version: 1.2.2(next@14.2.0-canary.62(react-dom@18.2.0(react@18.2.0))(react@18.2.0))
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       next:
         specifier: canary
         version: 14.2.0-canary.62(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -94,6 +100,9 @@ packages:
     resolution: {integrity: sha512-zQH//gdOmuu7nt2oJR29vFhDv88oGPmVw6BggmrHeMI+xgEkp1B2dX9/bMBSYtK0dyLX/aOmesKS09g222K1/g==}
     peerDependencies:
       react: '>=16'
+
+  '@mediapipe/camera_utils@0.3.1675466862':
+    resolution: {integrity: sha512-siuXBoUxWo9WL0MeAxIxvxY04bvbtdNl7uCxoJxiAiRtNnCYrurr7Vl5VYQ94P7Sq0gVq6PxIDhWWeZ/pLnSzw==}
 
   '@mediapipe/drawing_utils@0.3.1675466124':
     resolution: {integrity: sha512-/IWIB/iYRMtiUKe3k7yGqvwseWHCOqzVpRDfMgZ6gv9z7EEimg6iZbRluoPbcNKHbYSxN5yOvYTzUYb8KVf22Q==}
@@ -743,6 +752,9 @@ packages:
     resolution: {integrity: sha512-kUpHOLiH5GB0ERSv4pxqlL0RYKnOXtgGtVe7shDGfhS0AZ4D1ouKFYAcLcZhql8aMspDNzaUCumGHZ78tb2fTg==}
     engines: {node: '>= 12.0.0'}
 
+  lodash@4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+
   long@4.0.0:
     resolution: {integrity: sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==}
 
@@ -1289,6 +1301,8 @@ snapshots:
       '@types/mdx': 2.0.11
       '@types/react': 18.2.55
       react: 18.2.0
+
+  '@mediapipe/camera_utils@0.3.1675466862': {}
 
   '@mediapipe/drawing_utils@0.3.1675466124': {}
 
@@ -1902,6 +1916,8 @@ snapshots:
       lightningcss-linux-x64-gnu: 1.24.1
       lightningcss-linux-x64-musl: 1.24.1
       lightningcss-win32-x64-msvc: 1.24.1
+
+  lodash@4.17.21: {}
 
   long@4.0.0: {}
 
