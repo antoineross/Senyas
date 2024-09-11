@@ -65,21 +65,20 @@ function App() {
         // Progressive loading
         const loadedModel = await tf.loadLayersModel(tf.io.fromMemory(modelJson), {
           onProgress: (fraction) => {
-            console.log(`Model loading progress: ${(fraction * 100).toFixed(2)}%`);
             // You can update a loading state here if you want to show a progress bar
           }
         });
         
         netRef.current = loadedModel;
         setIsModelLoaded(true);
-        console.log('Model loaded successfully.');
       } catch (error) {
-        console.error('Error loading model:', error);
+        // Handle error silently
       }
     };
 
     loadModel();
   }, []);
+  
   const onResults = useCallback((model: any) => {
     const video = webcamRef.current?.video;
     if (video?.readyState === 4) {
@@ -139,16 +138,16 @@ function App() {
     const holistic = new holistics.Holistic({
       locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`
     });
-  
+
     holistic.setOptions({
       modelComplexity: 1,
       smoothLandmarks: true,
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5
     });
-  
+
     holistic.onResults(onResults);
-  
+
     if (typeof window !== 'undefined' && webcamRef.current && webcamRef.current.video) {
       const camera = new cam.Camera(webcamRef.current.video, {
         onFrame: async () => {
@@ -160,7 +159,7 @@ function App() {
         height: 480
       });
       camera.start();
-  
+
       return () => {
         camera.stop();
       };
