@@ -1,16 +1,14 @@
 import Webcam from 'react-webcam';
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { labelMap, makePrediction } from "../components/utilities"; 
+import { Storage } from '@google-cloud/storage';
 
 import * as tf from "@tensorflow/tfjs";
-import { nextFrame } from "@tensorflow/tfjs";
 
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import * as cam from '@mediapipe/camera_utils';
-import * as controls from '@mediapipe/control_utils';
 import * as holistics from '@mediapipe/holistic';
-import * as drawingUtils from '@mediapipe/drawing_utils';
 import './App.css';
 
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
@@ -29,7 +27,6 @@ let frameCounter = 0;
 const framesData = [];
 let predictioncount = 0;
 let totalLatency = 0;
-import { Storage } from '@google-cloud/storage';
 
 function App() {
   const webcamRef = useRef(null);
@@ -44,7 +41,7 @@ function App() {
   useEffect(() => {
     // Load TensorFlow Model from Google Cloud Storage
     const loadModel = async () => {
-      const credentials = JSON.parse(process.env.REACT_APP_GOOGLE_APPLICATION_CREDENTIALS_JSON || '{}');
+      const credentials = JSON.parse(process.env.GOOGLE_CLOUD_CREDENTIALS || '{}');
       
       const storage = new Storage({
         credentials,
