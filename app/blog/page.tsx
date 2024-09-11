@@ -1,8 +1,8 @@
 import { BlogPosts } from 'app/components/posts'
 
 export const metadata = {
-  title: 'Blog',
-  description: 'Read my blog.',
+  title: 'Senyas FSL Translator Blog',
+  description: 'The authors of Senyas write about their experiences and insights after working on a web application that translates FSL into text through computer vision and machine learning.',
 }
 
 export default function Page() {
