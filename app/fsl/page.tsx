@@ -80,10 +80,9 @@ function App() {
 
     loadModel();
   }, []);
-
   const onResults = useCallback((model: any) => {
-    if (webcamRef.current?.video.readyState === 4) {
-      const video = webcamRef.current.video;
+    const video = webcamRef.current?.video;
+    if (video?.readyState === 4) {
       const videoWidth = video.videoWidth;
       const videoHeight = video.videoHeight;
 
@@ -140,26 +139,28 @@ function App() {
     const holistic = new holistics.Holistic({
       locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`
     });
-
+  
     holistic.setOptions({
       modelComplexity: 1,
       smoothLandmarks: true,
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5
     });
-
+  
     holistic.onResults(onResults);
-
-    if (typeof window !== 'undefined' && webcamRef.current) {
+  
+    if (typeof window !== 'undefined' && webcamRef.current && webcamRef.current.video) {
       const camera = new cam.Camera(webcamRef.current.video, {
         onFrame: async () => {
-          await holistic.send({ image: webcamRef.current!.video });
+          if (webcamRef.current && webcamRef.current.video) {
+            await holistic.send({ image: webcamRef.current.video });
+          }
         },
         width: 640,
         height: 480
       });
       camera.start();
-
+  
       return () => {
         camera.stop();
       };
