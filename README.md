@@ -1,41 +1,42 @@
-# Website
+# Portfolio Blog Starter
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+This is a porfolio site template complete with a blog. Includes:
 
-### Installation
+- MDX and Markdown support
+- Optimized for SEO (sitemap, robots, JSON-LD schema)
+- RSS Feed
+- Dynamic OG images
+- Syntax highlighting
+- Tailwind v4
+- Vercel Speed Insights / Web Analytics
+- Geist font
 
-```
-$ yarn
-```
+## Demo
 
-### Local Development
+https://portfolio-blog-starter.vercel.app
 
-```
-$ yarn start
-```
+## How to Use
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+You can choose from one of the following two methods to use this repository:
 
-### Build
+### One-Click Deploy
 
-```
-$ yarn build
-```
+Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=vercel-examples):
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/examples/tree/main/solutions/blog&project-name=blog&repository-name=blog)
 
-### Deployment
+### Clone and Deploy
 
-Using SSH:
+Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [pnpm](https://pnpm.io/installation) to bootstrap the example:
 
-```
-$ USE_SSH=true yarn deploy
-```
-
-Not using SSH:
-
-```
-$ GIT_USER=<Your GitHub username> yarn deploy
+```bash
+pnpm create next-app --example https://github.com/vercel/examples/tree/main/solutions/blog blog
 ```
 
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+Then, run Next.js in development mode:
+
+```bash
+pnpm dev
+```
+
+Deploy it to the cloud with [Vercel](https://vercel.com/templates) ([Documentation](https://nextjs.org/docs/app/building-your-application/deploying)).
