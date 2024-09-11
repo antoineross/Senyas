@@ -16,15 +16,8 @@
   "dependencies": {
     "@docusaurus/core": "3.0.1",
     "@docusaurus/preset-classic": "3.0.1",
+    "@google-cloud/storage": "^7.12.1",
     "@mdx-js/react": "^3.0.0",
-    "clsx": "^2.0.0",
-    "prism-react-renderer": "^2.3.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "react-scripts": "^5.0.1",
-    "react-webcam": "^5.2.3",
-    "socket.io-client": "^4.1.1",
-    "web-vitals": "^1.1.2",
     "@mediapipe/camera_utils": "^0.3.1620247984",
     "@mediapipe/control_utils": "^0.6.1675466023",
     "@mediapipe/drawing_utils": "^0.3.1675466124",
@@ -37,7 +30,15 @@
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "@vercel/speed-insights": "^1.0.2",
-    "device-detector-js": "^3.0.3"
+    "clsx": "^2.0.0",
+    "device-detector-js": "^3.0.3",
+    "prism-react-renderer": "^2.3.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-scripts": "^5.0.1",
+    "react-webcam": "^5.2.3",
+    "socket.io-client": "^4.1.1",
+    "web-vitals": "^1.1.2"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.0.1",

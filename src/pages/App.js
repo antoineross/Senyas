@@ -29,6 +29,7 @@ let frameCounter = 0;
 const framesData = [];
 let predictioncount = 0;
 let totalLatency = 0;
+import { Storage } from '@google-cloud/storage';
 
 function App() {
   const webcamRef = useRef(null);
@@ -41,10 +42,27 @@ function App() {
   const [camWidth, setCamWidth] = useState(0);
 
   useEffect(() => {
-    // Load TensorFlow Model in the client-side environment
+    // Load TensorFlow Model from Google Cloud Storage
     const loadModel = async () => {
-      netRef.current = await tf.loadLayersModel('https://senyasfsltranslatorv2.s3.jp-tok.cloud-object-storage.appdomain.cloud/model.json');
-      netRef.current.summary();
+      const credentials = JSON.parse(process.env.REACT_APP_GOOGLE_APPLICATION_CREDENTIALS_JSON || '{}');
+      
+      const storage = new Storage({
+        credentials,
+        projectId: credentials.project_id
+      });
+
+      const bucketName = 'senyas';
+      const fileName = 'model.json';
+
+      try {
+        const [modelFile] = await storage.bucket(bucketName).file(fileName).download();
+        const modelJson = JSON.parse(modelFile.toString());
+        
+        netRef.current = await tf.loadLayersModel(tf.io.fromMemory(modelJson));
+        netRef.current.summary();
+      } catch (error) {
+        console.error('Error loading model:', error);
+      }
     };
 
     if (typeof window !== 'undefined') {
@@ -212,6 +230,24 @@ async function processFramesData(framesData, ctx, videoWidth, videoHeight) {
 
   const scores = netRef.current.predict(expanded);
   const label = await makePrediction(scores, 0.8, videoWidth, videoHeight, ctx)
+
+  // After processing the frames and making predictions
+  const jsonData = {
+    frames: framesData,
+    prediction: label,
+    timestamp: new Date().toISOString(),
+  };
+
+  // Generate a unique filename
+  const fileName = `prediction_${Date.now()}.json`;
+
+  // Call the upload function
+  try {
+    await uploadJsonToGCS(fileName, jsonData);
+    console.log('Data uploaded successfully');
+  } catch (error) {
+    console.error('Error uploading data:', error);
+  }
 
   // End time
   const endTime = performance.now();
